@@ -1,0 +1,53 @@
+import assert from 'node:assert/strict';
+import {spawn} from 'node:child_process';
+import {mkdtemp,readFile,writeFile,rm} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+
+const root=process.cwd();
+const dir=await mkdtemp(join(tmpdir(),'vc-order-flow-'));
+const port=31000+Math.floor(Math.random()*1000);
+const base=`http://127.0.0.1:${port}`;
+const fixture=JSON.parse(await readFile(join(root,'data/content.json'),'utf8'));
+const work=fixture.works[0];
+work.published=true;work.forSale=true;work.priceCents=2500;work.stock=1;work.shippingWeightGrams=300;
+fixture.commerce.enabled=false;
+fixture.commerce.colissimoHomeEnabled=true;
+fixture.commerce.colissimoHomePriceCents=700;
+fixture.commerce.preparationDays='3 jours ouvrés';
+fixture.commerce.termsUrl='/conditions-generales-de-vente';
+fixture.commerce.withdrawalUrl='/livraison-et-retours';
+const contentFile=join(dir,'content.json');
+await writeFile(contentFile,JSON.stringify(fixture));
+const server=spawn(process.execPath,['node_modules/next/dist/bin/next','start','--hostname','127.0.0.1','--port',String(port)],{cwd:root,env:{...process.env,SITE_DATA_DIR:dir,ADMIN_PASSWORD:'order-flow-password',ADMIN_CLIENT_PASSWORD:'',ADMIN_SESSION_SECRET:'order-flow-session-secret'},stdio:'ignore'});
+const json=async(response)=>({status:response.status,body:await response.json()});
+const post=(path,body,cookie='')=>fetch(base+path,{method:'POST',headers:{'Content-Type':'application/json',Origin:base,...(cookie?{Cookie:cookie}:{})},body:JSON.stringify(body)}).then(json);
+let cookie='';
+const patchOrder=(id,status,trackingNumber='')=>fetch(base+'/api/admin/orders',{method:'PATCH',headers:{'Content-Type':'application/json',Origin:base,Cookie:cookie},body:JSON.stringify({id,status,trackingNumber})}).then(json);
+const request={items:[{workId:work.id,quantity:1}],customer:{firstName:'Test',lastName:'Commande',email:'test@example.com',phone:'0612345678'},address:{line1:'1 rue de test',line2:'',postalCode:'22340',city:'Plévin'},delivery:{method:'colissimo-home'},notes:'Test isolé',consent:true};
+try{
+ for(let attempt=0;attempt<100;attempt++){try{await fetch(base+'/api/orders');break}catch{await new Promise(resolve=>setTimeout(resolve,100))}}
+ assert.equal((await post('/api/orders',request)).status,503,'commandes fermées');
+ fixture.commerce.enabled=true;await writeFile(contentFile,JSON.stringify(fixture));
+ const submitted=await post('/api/orders',request);assert.equal(submitted.status,201,JSON.stringify(submitted.body));
+ const login=await fetch(base+'/api/admin/login',{method:'POST',headers:{'Content-Type':'application/json',Origin:base},body:JSON.stringify({password:'order-flow-password'})});
+ assert.equal(login.status,200,'connexion admin');cookie=login.headers.get('set-cookie')?.split(';')[0]||'';assert.ok(cookie);
+ const orders=await fetch(base+'/api/admin/orders',{headers:{Cookie:cookie}}).then(json);
+ assert.equal(orders.status,200);assert.equal(orders.body.length,1);const order=orders.body[0];
+ assert.equal(order.status,'new');assert.equal(order.totalCents,3200);
+ assert.equal(JSON.parse(await readFile(contentFile,'utf8')).works[0].stock,1,'la demande ne réserve pas le stock');
+ assert.equal((await patchOrder(order.id,'shipped','ABC123')).status,409,'expédition directe bloquée');
+ assert.equal((await patchOrder(order.id,'confirmed')).status,200,'confirmation manuelle');
+ assert.equal(JSON.parse(await readFile(contentFile,'utf8')).works[0].stock,0,'stock décompté à la confirmation');
+ assert.equal((await post('/api/orders',request)).status,409,'demande supplémentaire bloquée quand stock épuisé');
+ assert.equal((await patchOrder(order.id,'cancelled')).status,200,'annulation');
+ assert.equal(JSON.parse(await readFile(contentFile,'utf8')).works[0].stock,1,'stock rétabli');
+ const second=await post('/api/orders',request);assert.equal(second.status,201);
+ const latest=await fetch(base+'/api/admin/orders',{headers:{Cookie:cookie}}).then(json);const secondId=latest.body[0].id;
+ assert.equal((await patchOrder(secondId,'confirmed')).status,200);
+ assert.equal((await patchOrder(secondId,'preparing')).status,200);
+ assert.equal((await patchOrder(secondId,'shipped')).status,400,'suivi requis');
+ assert.equal((await patchOrder(secondId,'shipped','AB123456FR')).status,200);
+ assert.equal((await patchOrder(secondId,'cancelled')).status,409,'expédition définitive');
+ console.log('Parcours commande validé : fermeture, demande, confirmation manuelle, stock, annulation, suivi et expédition.');
+}finally{server.kill();await rm(dir,{recursive:true,force:true})}

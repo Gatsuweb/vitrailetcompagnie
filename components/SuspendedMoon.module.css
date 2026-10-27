@@ -1,0 +1,108 @@
+.rig {
+  --cord-length:clamp(35px,6svh,72px);
+  --attachment:46%;
+  position:absolute;
+  z-index:-1;
+  top:0;
+  left:60%;
+  width:clamp(170px,18vw,320px);
+  height:var(--cord-length);
+  transform:translateX(calc(-1 * var(--attachment)));
+  pointer-events:none;
+}
+.swing {
+  position:absolute;
+  inset:0;
+  transform-origin:var(--attachment) 0;
+}
+.cord {
+  position:absolute;
+  top:0;
+  left:var(--attachment);
+  width:2px;
+  height:100%;
+  margin-left:-1px;
+  background:linear-gradient(90deg,#615039,#d2bc91 48%,#796548);
+  transform-origin:center top;
+}
+.drop {
+  position:absolute;
+  top:100%;
+  left:0;
+  width:100%;
+}
+.tilt { transform-origin:var(--attachment) 0; }
+.image { display:block; width:100%; height:auto; }
+.rig[data-moon="hidden"] { visibility:hidden; }
+.rig[data-moon="hidden"] .drop {
+  transform:translate3d(0,calc(-100% - var(--cord-length) - 32px),0);
+}
+.rig[data-moon="hidden"] .cord { transform:scaleY(0); }
+
+.rig[data-moon="falling"] .drop {
+  animation:fall 1250ms both;
+}
+.rig[data-moon="falling"] .cord {
+  animation:unroll 1250ms both;
+}
+.rig[data-moon="falling"] .swing {
+  animation:swing 2200ms 800ms ease-in-out both;
+}
+.rig[data-moon="falling"] .tilt {
+  animation:tilt 2200ms 800ms ease-in-out both;
+}
+
+/* The cord's scale and the object's translation use identical timings.
+   Its lower endpoint therefore stays on the attachment throughout the fall. */
+@keyframes fall {
+  0% { transform:translate3d(0,calc(-100% - var(--cord-length) - 32px),0); animation-timing-function:cubic-bezier(.42,0,.85,.55); }
+  40% { transform:translate3d(0,calc(-1 * var(--cord-length)),0); animation-timing-function:cubic-bezier(.3,.25,.75,1); }
+  64% { transform:translate3d(0,calc(var(--cord-length) * .08),0); animation-timing-function:ease-out; }
+  80% { transform:translate3d(0,calc(var(--cord-length) * -.03),0); animation-timing-function:ease-in-out; }
+  100% { transform:translate3d(0,0,0); }
+}
+@keyframes unroll {
+  0% { transform:scaleY(0); animation-timing-function:cubic-bezier(.42,0,.85,.55); }
+  40% { transform:scaleY(0); animation-timing-function:cubic-bezier(.3,.25,.75,1); }
+  64% { transform:scaleY(1.08); animation-timing-function:ease-out; }
+  80% { transform:scaleY(.97); animation-timing-function:ease-in-out; }
+  100% { transform:scaleY(1); }
+}
+@keyframes swing {
+  0% { transform:rotate(0deg); }
+  14% { transform:rotate(1.2deg); }
+  38% { transform:rotate(-.75deg); }
+  62% { transform:rotate(.4deg); }
+  82% { transform:rotate(-.16deg); }
+  100% { transform:rotate(0deg); }
+}
+@keyframes tilt {
+  0% { transform:rotate(0deg); }
+  14% { transform:rotate(1.4deg); }
+  38% { transform:rotate(-.9deg); }
+  62% { transform:rotate(.45deg); }
+  82% { transform:rotate(-.18deg); }
+  100% { transform:rotate(0deg); }
+}
+@media (max-width:767px), (min-width:768px) and (max-width:1023px) and (max-aspect-ratio:1/1) {
+  .rig {
+    --cord-length:calc(var(--scene-top,76px) + 4px);
+    left:60%;
+    width:19.14vw;
+  }
+  .cord { width:1px; margin-left:-.5px; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .rig[data-moon="falling"] .drop,
+  .rig[data-moon="falling"] .cord,
+  .rig[data-moon="falling"] .swing,
+  .rig[data-moon="falling"] .tilt { animation:none; }
+}
+
+@media(max-width:767px) {
+  .rig {
+    --cord-length:calc(var(--scene-top,76px) + 30px);
+    left:76%;
+    width:clamp(85px,25vw,155px);
+  }
+}

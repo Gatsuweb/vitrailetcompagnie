@@ -1,0 +1,54 @@
+:root {
+  --color-paper: #faf6ee;
+  --color-ivory: #fffaf2;
+  --color-sand: #f0e3cf;
+  --color-blush: #eacbb5;
+  --color-terracotta: #9b4e39;
+  --color-terracotta-deep: #70392e;
+  --color-ochre: #a96525;
+  --color-ink: #49352e;
+  --color-muted: #67564a;
+  --color-line: #cbb9a3;
+  --glass-texture: url('/images/glass-texture.webp');
+  --surface-paper: linear-gradient(rgb(250 246 238 / .90), rgb(250 246 238 / .90)) center / cover no-repeat, var(--glass-texture) center / cover fixed no-repeat;
+  --surface-ivory: var(--surface-paper);
+  --surface-sand: linear-gradient(rgb(240 227 207 / .92), rgb(240 227 207 / .92)) center / cover no-repeat, var(--glass-texture) center / cover fixed no-repeat;
+  --surface-blush: linear-gradient(rgb(234 203 181 / .92), rgb(234 203 181 / .92)) center / cover no-repeat, var(--glass-texture) center / cover fixed no-repeat;
+  --font-body: Arial, Helvetica, sans-serif;
+  --font-display: Georgia, serif;
+  --page-gutter: clamp(24px, 7vw, 120px);
+  --space-section: clamp(70px, 8vw, 116px);
+}
+* { box-sizing: border-box; }
+html { scroll-padding-top: 90px; }
+body { margin: 0; background: var(--surface-paper); color: var(--color-ink); font-family: var(--font-body); -webkit-font-smoothing: antialiased; }
+a { color: inherit; }
+::selection { background: #e7bc78; color: #35261e; }
+:focus-visible { outline: 3px solid var(--color-terracotta); outline-offset: 4px; }
+.reveal-on-scroll { opacity: 0; transform: translateY(28px); transition: opacity .75s ease, transform .75s cubic-bezier(.2,.8,.2,1); }
+.reveal-on-scroll.is-visible { opacity: 1; transform: none; }
+body:has(#accueil[data-intro="intro"]) [data-site-nav],
+body:has(#accueil[data-intro="revealing"]) [data-site-nav] { opacity: 0; visibility: hidden; pointer-events: none; }
+@media (max-width:650px) { html { scroll-padding-top: 78px; } }
+@media (prefers-reduced-motion:reduce) {
+  html { scroll-behavior: auto; }
+  .reveal-on-scroll { opacity: 1; transform: none; transition: none; }
+}
+
+[data-section-reveal="true"] {
+  opacity: 0;
+  transform: translate3d(0, 30px, 0);
+  transition: opacity .8s ease, transform .9s cubic-bezier(.22, 1, .36, 1);
+}
+[data-section-reveal="true"][data-section-visible="true"] {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-section-reveal="true"] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+

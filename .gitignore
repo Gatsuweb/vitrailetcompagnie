@@ -1,0 +1,14 @@
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+.env*
+!.env.example
+
+data/messages.json
+data/orders.json
+data/uploads/
+admin-access.local.txt
+tmp/
+tests/*.png
+tests/*.webp
