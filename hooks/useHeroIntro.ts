@@ -39,11 +39,11 @@ export function useHeroIntro() {
     body.style.overflow = 'hidden';
     siblings.forEach(element => { element.inert = true; });
     window.scrollTo({ top: 0, behavior: 'instant' });
-    buttonRef.current?.focus({ preventScroll: true });
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') { event.preventDefault(); finish(); }
-      // The introduction has one action; keep keyboard focus on it until entry.
+      // Move focus to the sole action only when the visitor starts keyboard
+      // navigation. This avoids showing a selected state on pointer devices.
       if (event.key === 'Tab') {
         event.preventDefault();
         buttonRef.current?.focus({ preventScroll: true });

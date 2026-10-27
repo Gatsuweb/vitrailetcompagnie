@@ -183,6 +183,8 @@
     --mobile-scene-height:calc(100vw * 1672 / 941);
     padding-top:calc(var(--scene-top) + var(--mobile-scene-height) + 32px);
   }
+  .hero[data-intro="intro"],
+  .hero[data-intro="revealing"] { --scene-top:0px; }
   .scene { aspect-ratio:941 / 1672; }
   .image, .foreground .image {
     object-fit:contain;

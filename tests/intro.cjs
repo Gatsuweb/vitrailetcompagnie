@@ -1,17 +1,18 @@
 const { chromium } = require('@playwright/test');
 const assert = require('node:assert/strict');
+const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
 (async () => {
   const browser = await chromium.launch({ channel:'msedge', headless:true });
   try {
     const page = await browser.newPage({ viewport:{width:1440,height:900} });
     const errors = [];
     page.on('pageerror', e=>errors.push(e.message));
-    await page.goto('http://localhost:3000', {waitUntil:'networkidle'});
+    await page.goto(baseUrl, {waitUntil:'networkidle'});
     const hero=page.locator('#accueil');
     assert.equal(await hero.getAttribute('data-intro'),'intro');
     assert.equal(await page.getByRole('dialog').count(),1);
     assert.equal(await page.locator('#hero-title').isVisible(),false);
-    assert.equal(await page.evaluate(()=>document.activeElement.textContent.trim()),'Découvrir ↗');
+    assert.notEqual(await page.evaluate(()=>document.activeElement?.tagName),'BUTTON');
     await page.keyboard.press('Tab');
     assert.equal(await page.evaluate(()=>document.activeElement.tagName),'BUTTON');
     await page.mouse.wheel(0,500);
@@ -44,7 +45,9 @@ const assert = require('node:assert/strict');
     assert.equal(await hero.getAttribute('data-intro'),'complete');
 
     const mobile=await browser.newPage({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
-    await mobile.goto('http://localhost:3000',{waitUntil:'networkidle'});
+    await mobile.goto(baseUrl,{waitUntil:'networkidle'});
+    assert.notEqual(await mobile.evaluate(()=>document.activeElement?.tagName),'BUTTON');
+    assert.equal(Math.round(await mobile.locator('#accueil [data-depth]').first().evaluate(el=>el.parentElement.getBoundingClientRect().top)),0);
     await mobile.screenshot({path:'tests/intro-mobile.png'});
     await mobile.getByRole('button',{name:'Découvrir',exact:true}).click();
     await mobile.waitForTimeout(1100);
@@ -52,7 +55,7 @@ const assert = require('node:assert/strict');
     assert(await mobile.evaluate(()=>document.documentElement.scrollWidth===innerWidth));
 
     const reduced=await browser.newPage({reducedMotion:'reduce'});
-    await reduced.goto('http://localhost:3000',{waitUntil:'networkidle'});
+    await reduced.goto(baseUrl,{waitUntil:'networkidle'});
     await reduced.getByRole('button',{name:'Découvrir',exact:true}).click();
     assert.equal(await reduced.locator('#accueil').getAttribute('data-intro'),'complete');
     assert.equal(await reduced.evaluate(()=>document.documentElement.style.overflow),'');
