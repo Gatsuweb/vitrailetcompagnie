@@ -35,7 +35,7 @@
     "aboutContactAccent": "Racontez-la-moi.",
     "servicesTitle": "À chaque envie,",
     "servicesAccent": "son éclat de lumière.",
-    "servicesIntro": "Je propose des créations disponibles et des pièces imaginées avec vous. Parlons de votre envie.",
+    "servicesIntro": "Je réalise des créations artisanales et des projets sur mesure pour les particuliers comme pour les entreprises.",
     "processTitle": "Comment naît",
     "processAccent": "un projet ?",
     "processOneTitle": "Racontez votre idée",
@@ -129,8 +129,8 @@
   },
   "profile": {
     "artist": "Valérie Le Bihan",
-    "introduction": "Je crée des pièces en vitrail inspirées par la nature. J'aime voir la couleur et la lumière donner vie à chaque intérieur.",
-    "story": "Je pars d’un dessin, d’une couleur ou d’un détail aperçu dans la nature. Je choisis ensuite les verres et j’assemble chaque pièce à la main pour qu’elle révèle ses nuances au fil du jour.",
+    "introduction": "Je suis Valérie Le Bihan. Je crée des vitraux artisanaux inspirés par la nature, la couleur et la lumière.",
+    "story": "Je respire et laisse venir mon inspiration du moment… Dessiner des œuvres décalées, pourquoi pas mystiques, ou tout simplement proches de ma terre natale… Chère Bretagne ! Rien n’est impossible.",
     "approach": "Fleurs, oiseaux, paysages et personnages nourrissent mon imaginaire. Je prends le temps de choisir les textures et les transparences qui rendent chaque création singulière.",
     "email": "vlebihan2222@gmail.com",
     "phone": "+33 6 62 81 98 66",
@@ -744,6 +744,24 @@
       "detail": "Décrivez-moi votre envie, les dimensions souhaitées et votre calendrier. Je vous répondrai pour envisager sa réalisation.",
       "image": "/images/creation-voiliers.webp",
       "alt": "Voiliers colorés réalisés en vitrail",
+      "published": true
+    },
+    {
+      "id": "particuliers",
+      "title": "Pour les particuliers",
+      "description": "Je réalise sur devis des vitraux pensés pour s’intégrer à votre intérieur et à son architecture.",
+      "detail": "Séparations de pièces en vitrail\nCréations pour ouvertures de portes\nŒils-de-bœuf\nCréations personnalisées selon vos envies et votre intérieur",
+      "image": "/images/creation-nature.webp",
+      "alt": "Créations en vitrail inspirées de la nature",
+      "published": true
+    },
+    {
+      "id": "entreprises",
+      "title": "Pour les entreprises",
+      "description": "Je conçois également sur devis des réalisations en vitrail pour les espaces professionnels et leur communication.",
+      "detail": "Panneaux publicitaires de type roll-up\nBrise-vue en vitrail",
+      "image": "/images/creation-dragon.webp",
+      "alt": "Dragon bleu réalisé en vitrail",
       "published": true
     },
     {
