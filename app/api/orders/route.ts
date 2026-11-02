@@ -1,5 +1,6 @@
 import {sameOrigin} from '../../../lib/admin-auth';
 import {addOrder,getSiteData,withCommerceLock} from '../../../lib/site-data';
+import {chronopostHomePriceCents} from '../../../lib/chronopost-pricing';
 export const runtime='nodejs';
 const recent=new Map<string,number[]>();
 const clean=(value:unknown,max:number)=>typeof value==='string'?value.trim().slice(0,max+1):'';
@@ -20,7 +21,7 @@ export async function POST(request:Request){
  const method=body.delivery?.method;if(method!=='chronopost-home'&&method!=='colissimo-home')return Response.json({error:'Choisissez un mode de livraison.'},{status:400});
  if(method==='chronopost-home'&&!data.commerce.chronopostHomeEnabled||method==='colissimo-home'&&!data.commerce.colissimoHomeEnabled)return Response.json({error:'Ce mode de livraison n’est pas disponible.'},{status:400});
  const weight=items.reduce((sum,item)=>sum+item.weightGrams*item.quantity,0);if(weight<1||weight>30000)return Response.json({error:'Le poids de cette commande ne permet pas la livraison choisie.'},{status:400});
- const subtotalCents=items.reduce((sum,item)=>sum+item.unitPriceCents*item.quantity,0);const normalShipping=method==='chronopost-home'?data.commerce.chronopostHomePriceCents:data.commerce.colissimoHomePriceCents;if(normalShipping<1)return Response.json({error:'Les frais de livraison ne sont pas encore configurés.'},{status:503});const priceCents=data.commerce.freeShippingThresholdCents>0&&subtotalCents>=data.commerce.freeShippingThresholdCents?0:normalShipping;
+ const subtotalCents=items.reduce((sum,item)=>sum+item.unitPriceCents*item.quantity,0);const normalShipping=method==='chronopost-home'?chronopostHomePriceCents(weight):data.commerce.colissimoHomePriceCents;if(normalShipping===null||normalShipping<1)return Response.json({error:'Les frais de livraison ne sont pas encore configurés.'},{status:503});const priceCents=data.commerce.freeShippingThresholdCents>0&&subtotalCents>=data.commerce.freeShippingThresholdCents?0:normalShipping;
  const ip=request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()||'local',now=Date.now(),hits=(recent.get(ip)||[]).filter(time=>now-time<60*60*1000);if(hits.length>=5)return Response.json({error:'Trop de demandes ont été envoyées. Réessayez plus tard.'},{status:429});recent.set(ip,[...hits,now]);
  const order=await addOrder({customer:{firstName,lastName,email,phone},address:{line1,line2,postalCode,city,country:'FR'},delivery:{method,priceCents},items,subtotalCents,totalCents:subtotalCents+priceCents,notes:clean(body.notes,1000)});
  return Response.json({reference:order.reference},{status:201});

@@ -119,13 +119,13 @@
     "enabled": false,
     "chronopostHomeEnabled": false,
     "colissimoHomeEnabled": false,
-    "chronopostHomePriceCents": 0,
+    "chronopostHomePriceCents": 1920,
     "colissimoHomePriceCents": 0,
     "freeShippingThresholdCents": 0,
     "preparationDays": "5",
     "orderNotice": "Votre demande est reçue. Valérie vérifiera la disponibilité et les frais de livraison, puis vous confirmera par e-mail le montant, le délai et les modalités de paiement. Aucun paiement n’est demandé sur ce site.",
-    "termsUrl": "",
-    "withdrawalUrl": ""
+    "termsUrl": "/conditions-generales-de-vente",
+    "withdrawalUrl": "/livraison-et-retours"
   },
   "profile": {
     "artist": "Valérie Le Bihan",
