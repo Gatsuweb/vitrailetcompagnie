@@ -47,6 +47,11 @@ export async function PUT(request:Request){
  const body=await request.json().catch(()=>null);
  const error=invalid(body);
  if(error)return Response.json({error},{status:400});
- await withCommerceLock(()=>saveSiteData(body));
- return Response.json({ok:true});
+ try{
+  await withCommerceLock(()=>saveSiteData(body));
+  return Response.json({ok:true});
+ }catch(error){
+  console.error('Échec de la sauvegarde du contenu',error);
+  return Response.json({error:'Le contenu n’a pas pu être enregistré. Réessayez plus tard.',storageError:error instanceof Error?error.name:'UnknownError'},{status:503});
+ }
 }
