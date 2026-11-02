@@ -116,7 +116,7 @@
     }
   ],
   "commerce": {
-    "enabled": false,
+    "enabled": true,
     "chronopostHomeEnabled": true,
     "colissimoHomeEnabled": false,
     "chronopostHomePriceCents": 1920,
@@ -616,8 +616,8 @@
       "featured": true,
       "published": true,
       "forSale": false,
-      "priceCents": 9999,
-      "stock": 1,
+      "priceCents": 0,
+      "stock": 0,
       "weightGrams": 250
     },
     {
@@ -684,7 +684,7 @@
       "image": "/api/media/a6eaba01-82a4-4a5b-8c2d-b7f7bc5da1ed.webp",
       "alt": "test",
       "featured": false,
-      "published": true,
+      "published": false,
       "forSale": false,
       "priceCents": 0,
       "stock": 0,
