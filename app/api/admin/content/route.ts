@@ -52,6 +52,6 @@ export async function PUT(request:Request){
   return Response.json({ok:true});
  }catch(error){
   console.error('Échec de la sauvegarde du contenu',error);
-  return Response.json({error:'Le contenu n’a pas pu être enregistré. Réessayez plus tard.',storageError:error instanceof Error?error.name:'UnknownError'},{status:503});
+  return Response.json({error:'Le contenu n’a pas pu être enregistré. Réessayez plus tard.',storageError:error instanceof Error?error.name:'UnknownError',storageMessage:error instanceof Error?error.message.slice(0,200):''},{status:503});
  }
 }
