@@ -2,7 +2,7 @@ import 'server-only';
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { randomUUID } from 'node:crypto';
-import {BlobPreconditionFailedError,get as getBlob,put as putBlob} from '@vercel/blob';
+import {BlobPreconditionFailedError,get as getBlob,head as headBlob,put as putBlob} from '@vercel/blob';
 import {editorialDefaults,imageDefaults,faqDefaults} from './editorial-content';
 export type Work = { id:string; title:string; category:string; description:string; image:string; images:string[]; alt:string; dimensions:string; featured:boolean; published:boolean; forSale:boolean; priceCents:number; stock:number; weightGrams:number; shippingWeightGrams:number };
 export type Event = { id:string; title:string; date:string; endDate:string; place:string; address:string; description:string; details:string; admission:string; bookingEmail:string; externalUrl:string; image:string; alt:string; published:boolean };
@@ -41,7 +41,7 @@ const pathFor=(name:string)=>join(/* turbopackIgnore: true */ dataDir,name);
 export const usesBlobStorage=process.env.SITE_STORAGE==='blob';
 let writeQueue:Promise<unknown>=Promise.resolve();
 const blobPath=(name:string)=>'site-data/'+name;
-async function readStoredJson<T>(name:string,fallback:T):Promise<{value:T;etag:string|null}>{
+async function readStoredJson<T>(name:string,fallback:T,withCurrentEtag=false):Promise<{value:T;etag:string|null}>{
  if(usesBlobStorage){
   const result=await getBlob(blobPath(name),{access:'private',useCache:false});
   if(!result){
@@ -52,7 +52,7 @@ async function readStoredJson<T>(name:string,fallback:T):Promise<{value:T;etag:s
    return {value:fallback,etag:null};
   }
   if(result.statusCode!==200||!result.stream)throw new Error('Lecture du stockage Vercel impossible.');
-  return {value:await new Response(result.stream).json() as T,etag:result.blob.etag};
+  return {value:await new Response(result.stream).json() as T,etag:withCurrentEtag?(await headBlob(blobPath(name))).etag:result.blob.etag};
  }
  try{return {value:JSON.parse(await readFile(/* turbopackIgnore: true */ pathFor(name),'utf8')) as T,etag:null}}
  catch(error){if((error as NodeJS.ErrnoException).code==='ENOENT')return {value:fallback,etag:null};throw error}
@@ -66,10 +66,10 @@ async function writeStoredJson<T>(name:string,value:T,etag:string|null){
  if(process.env.VERCEL==='1')throw new Error('Stockage persistant non configuré : connectez Vercel Blob et définissez SITE_STORAGE=blob.');
  await mkdir(dataDir,{recursive:true});const temporary=pathFor(name+'.'+randomUUID()+'.tmp');await writeFile(temporary,JSON.stringify(value,null,2),{encoding:'utf8',mode:0o600});await rename(temporary,pathFor(name));
 }
-async function saveJson<T>(name:string,value:T){const pending=writeQueue.then(async()=>{const {etag}=await readStoredJson(name,value);await writeStoredJson(name,value,etag)});writeQueue=pending.catch(()=>undefined);await pending}
+async function saveJson<T>(name:string,value:T){const pending=writeQueue.then(async()=>{const {etag}=await readStoredJson(name,value,true);await writeStoredJson(name,value,etag)});writeQueue=pending.catch(()=>undefined);await pending}
 async function updateJson<T,R>(name:string,fallback:T,update:(current:T)=>{value:T;result:R}):Promise<R>{
  for(let attempt=0;attempt<5;attempt++){
-  const {value,etag}=await readStoredJson(name,fallback);
+  const {value,etag}=await readStoredJson(name,fallback,true);
   const next=update(value);
   try{await writeStoredJson(name,next.value,etag);return next.result}
   catch(error){if(!(usesBlobStorage&&error instanceof BlobPreconditionFailedError&&attempt<4))throw error}
