@@ -29,7 +29,7 @@ export default function AdminCreations({data,onEdit,notify}:Props){
     <label><input type="checkbox" checked={data.commerce.colissimoHomeEnabled} onChange={event=>onEdit(d=>{d.commerce.colissimoHomeEnabled=event.target.checked})}/> Colissimo à domicile</label>
    </div>
    <div className={styles.grid}>
-    <p>Chronopost Chrono 18 : tarif calculé automatiquement avec le poids du colis emballé (19,20 € jusqu’à 1 kg ; 21,60 € jusqu’à 3 kg ; 24,60 € jusqu’à 10 kg ; 37,20 € jusqu’à 20 kg ; 50,40 € jusqu’à 30 kg).</p>
+    <p>Chronopost Chrono 18 : tarif estimé automatiquement avec le poids prévu du colis (19,20 € jusqu’à 1 kg ; 21,60 € jusqu’à 3 kg ; 24,60 € jusqu’à 10 kg ; 37,20 € jusqu’à 20 kg ; 50,40 € jusqu’à 30 kg). Le montant définitif est confirmé avant la vente.</p>
     <label className={styles.field}>Frais client Colissimo TTC (€)<input type="number" min="0" step=".01" value={(data.commerce.colissimoHomePriceCents/100).toFixed(2)} onChange={event=>onEdit(d=>{d.commerce.colissimoHomePriceCents=cents(event.target.value)})}/></label>
     <label className={styles.field}>Livraison offerte dès (€)<input type="number" min="0" step=".01" value={(data.commerce.freeShippingThresholdCents/100).toFixed(2)} onChange={event=>onEdit(d=>{d.commerce.freeShippingThresholdCents=cents(event.target.value)})}/><small>0 désactive ce seuil.</small></label>
     <label className={styles.field}>Délai de préparation<input value={data.commerce.preparationDays} placeholder="Ex. 3 à 5 jours ouvrés" onChange={event=>onEdit(d=>{d.commerce.preparationDays=event.target.value})}/></label>
@@ -37,7 +37,7 @@ export default function AdminCreations({data,onEdit,notify}:Props){
     <label className={styles.field}>Retours et rétractation<input value={data.commerce.withdrawalUrl} placeholder="/livraison-et-retours" onChange={event=>onEdit(d=>{d.commerce.withdrawalUrl=event.target.value})}/></label>
    </div>
    <label className={styles.field}>Message après commande<textarea value={data.commerce.orderNotice} onChange={event=>onEdit(d=>{d.commerce.orderNotice=event.target.value})}/></label>
-   <div className={styles.notice}><strong>Préparation de la livraison</strong><p>Les prix Chrono 18 ci-dessus correspondent aux tarifs standards HT du document fourni, majorés de 20 % pour obtenir le coût TTC du transport, sans remise ni option. Renseignez le poids du colis emballé pour chaque création vendue. Avant d’expédier un vitrail, vérifiez que le contrat Chronopost couvre bien cette catégorie de biens ; les relais et les étiquettes automatiques nécessitent les accès transporteurs.</p></div>
+   <div className={styles.notice}><strong>Préparation de la livraison</strong><p>Les prix Chrono 18 ci-dessus correspondent aux tarifs standards HT du document fourni, majorés de 20 % pour obtenir le coût TTC du transport, sans remise ni option. Les poids préremplis sont des estimations : pesez chaque colis une fois emballé et corrigez sa fiche avant de confirmer le montant au client. Vérifiez également que le contrat Chronopost couvre bien les vitraux.</p></div>
   </section>
 
   <section className={styles.panel+' '+styles.creationsPanel}>
@@ -57,7 +57,7 @@ export default function AdminCreations({data,onEdit,notify}:Props){
      <label className={styles.field}>Prix TTC (€)<input type="number" min="0" step=".01" value={(work.priceCents/100).toFixed(2)} onChange={event=>update(index,w=>{w.priceCents=cents(event.target.value)})}/></label>
      <label className={styles.field}>Stock<input type="number" min="0" step="1" value={work.stock} onChange={event=>update(index,w=>{w.stock=whole(event.target.value)})}/></label>
      <label className={styles.field}>Poids de la création (g)<input type="number" min="0" step="1" value={work.weightGrams} onChange={event=>update(index,w=>{w.weightGrams=whole(event.target.value)})}/></label>
-     <label className={styles.field}>Poids du colis emballé (g)<input type="number" min="0" step="1" value={work.shippingWeightGrams} onChange={event=>update(index,w=>{w.shippingWeightGrams=whole(event.target.value)})}/><small>Requis pour activer la commande en ligne.</small></label>
+     <label className={styles.field}>Poids prévu du colis emballé (g)<input type="number" min="0" step="1" value={work.shippingWeightGrams} onChange={event=>update(index,w=>{w.shippingWeightGrams=whole(event.target.value)})}/><small>Estimation à corriger après emballage. Requis pour la prise de commande.</small></label>
     </div>
     <div className={styles.checkRow}><label><input type="checkbox" checked={work.featured} onChange={event=>update(index,w=>{w.featured=event.target.checked})}/> À la une sur l’accueil</label><label><input type="checkbox" checked={work.published} onChange={event=>update(index,w=>{w.published=event.target.checked})}/> Publier cette création</label></div>
    </article>)}

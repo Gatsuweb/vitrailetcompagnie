@@ -43,7 +43,7 @@ let writeQueue:Promise<unknown>=Promise.resolve();
 const blobPath=(name:string)=>'site-data/'+name;
 async function readStoredJson<T>(name:string,fallback:T):Promise<{value:T;etag:string|null}>{
  if(usesBlobStorage){
-  const result=await getBlob(blobPath(name),{access:'private'});
+  const result=await getBlob(blobPath(name),{access:'private',useCache:false});
   if(!result){
    if(name==='content.json'){
     try{return {value:JSON.parse(await readFile(/* turbopackIgnore: true */ pathFor(name),'utf8')) as T,etag:null}}

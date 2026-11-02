@@ -117,7 +117,7 @@
   ],
   "commerce": {
     "enabled": false,
-    "chronopostHomeEnabled": false,
+    "chronopostHomeEnabled": true,
     "colissimoHomeEnabled": false,
     "chronopostHomePriceCents": 1920,
     "colissimoHomePriceCents": 0,
@@ -180,11 +180,11 @@
       "dimensions": "18 × 13 cm",
       "featured": true,
       "published": true,
-      "forSale": false,
+      "forSale": true,
       "priceCents": 5000,
       "stock": 1,
       "weightGrams": 150,
-      "shippingWeightGrams": 0
+      "shippingWeightGrams": 1000
     },
     {
       "id": "carpe-diem",
@@ -218,11 +218,11 @@
       "dimensions": "15 × 15 cm",
       "featured": false,
       "published": true,
-      "forSale": false,
+      "forSale": true,
       "priceCents": 7000,
       "stock": 1,
       "weightGrams": 130,
-      "shippingWeightGrams": 0
+      "shippingWeightGrams": 1000
     },
     {
       "id": "roses-sur-tige",
@@ -237,11 +237,11 @@
       "dimensions": "10 × 17 cm",
       "featured": true,
       "published": true,
-      "forSale": false,
+      "forSale": true,
       "priceCents": 2800,
       "stock": 3,
       "weightGrams": 0,
-      "shippingWeightGrams": 0
+      "shippingWeightGrams": 1000
     },
     {
       "id": "tulipes-sur-tige",
@@ -256,11 +256,11 @@
       "dimensions": "5,5 × 20 cm",
       "featured": false,
       "published": true,
-      "forSale": false,
+      "forSale": true,
       "priceCents": 2500,
       "stock": 3,
       "weightGrams": 0,
-      "shippingWeightGrams": 0
+      "shippingWeightGrams": 1000
     },
     {
       "id": "charlig-et-crinkle",
@@ -275,11 +275,11 @@
       "dimensions": "17 × 15 cm",
       "featured": false,
       "published": true,
-      "forSale": false,
+      "forSale": true,
       "priceCents": 4200,
       "stock": 1,
       "weightGrams": 297,
-      "shippingWeightGrams": 0
+      "shippingWeightGrams": 1047
     },
     {
       "id": "charlig-amour-pieuvre",
@@ -294,11 +294,11 @@
       "dimensions": "17 × 15 cm",
       "featured": false,
       "published": true,
-      "forSale": false,
+      "forSale": true,
       "priceCents": 4200,
       "stock": 1,
       "weightGrams": 297,
-      "shippingWeightGrams": 0
+      "shippingWeightGrams": 1047
     },
     {
       "id": "eclipse-le-chat",
@@ -313,11 +313,11 @@
       "dimensions": "15 × 9 cm",
       "featured": false,
       "published": true,
-      "forSale": false,
+      "forSale": true,
       "priceCents": 3000,
       "stock": 1,
       "weightGrams": 111,
-      "shippingWeightGrams": 0
+      "shippingWeightGrams": 1000
     },
     {
       "id": "ani-la-libellule",
@@ -332,11 +332,11 @@
       "dimensions": "19 × 14 cm",
       "featured": false,
       "published": true,
-      "forSale": false,
+      "forSale": true,
       "priceCents": 2500,
       "stock": 1,
       "weightGrams": 126,
-      "shippingWeightGrams": 0
+      "shippingWeightGrams": 1000
     },
     {
       "id": "holly-le-papillon",
@@ -351,11 +351,11 @@
       "dimensions": "18 × 16 cm",
       "featured": false,
       "published": true,
-      "forSale": false,
+      "forSale": true,
       "priceCents": 4500,
       "stock": 1,
       "weightGrams": 127,
-      "shippingWeightGrams": 0
+      "shippingWeightGrams": 1000
     },
     {
       "id": "les-poulettes",
@@ -371,11 +371,11 @@
       "dimensions": "17 × 10 cm",
       "featured": false,
       "published": true,
-      "forSale": false,
+      "forSale": true,
       "priceCents": 4000,
       "stock": 2,
       "weightGrams": 96,
-      "shippingWeightGrams": 0
+      "shippingWeightGrams": 1000
     },
     {
       "id": "rudy-le-papillon",
@@ -390,11 +390,11 @@
       "dimensions": "10 × 10 cm",
       "featured": false,
       "published": true,
-      "forSale": false,
+      "forSale": true,
       "priceCents": 2000,
       "stock": 1,
       "weightGrams": 63,
-      "shippingWeightGrams": 0
+      "shippingWeightGrams": 1000
     },
     {
       "id": "bateau",
@@ -409,11 +409,11 @@
       "dimensions": "12 × 10 cm",
       "featured": false,
       "published": true,
-      "forSale": false,
+      "forSale": true,
       "priceCents": 2000,
       "stock": 1,
       "weightGrams": 63,
-      "shippingWeightGrams": 0
+      "shippingWeightGrams": 1000
     },
     {
       "id": "angry-bird",
@@ -447,11 +447,11 @@
       "dimensions": "10 × 8 cm",
       "featured": false,
       "published": true,
-      "forSale": false,
+      "forSale": true,
       "priceCents": 1500,
       "stock": 1,
       "weightGrams": 69,
-      "shippingWeightGrams": 0
+      "shippingWeightGrams": 1000
     },
     {
       "id": "coiffes-bretonnes",
@@ -468,7 +468,7 @@
       "priceCents": 2000,
       "stock": 2,
       "weightGrams": 48,
-      "shippingWeightGrams": 0
+      "shippingWeightGrams": 1000
     },
     {
       "id": "petites-sardines",
@@ -485,7 +485,7 @@
       "priceCents": 2500,
       "stock": 2,
       "weightGrams": 48,
-      "shippingWeightGrams": 0
+      "shippingWeightGrams": 1000
     },
     {
       "id": "sabots-helene",
@@ -502,7 +502,7 @@
       "priceCents": 1500,
       "stock": 1,
       "weightGrams": 65,
-      "shippingWeightGrams": 0
+      "shippingWeightGrams": 1000
     },
     {
       "id": "etoile-bleue",
@@ -519,7 +519,7 @@
       "priceCents": 1500,
       "stock": 1,
       "weightGrams": 59,
-      "shippingWeightGrams": 0
+      "shippingWeightGrams": 1000
     },
     {
       "id": "hirondelle",
@@ -536,7 +536,7 @@
       "priceCents": 1500,
       "stock": 1,
       "weightGrams": 77,
-      "shippingWeightGrams": 0
+      "shippingWeightGrams": 1000
     },
     {
       "id": "bol-breton",
@@ -553,7 +553,7 @@
       "priceCents": 1500,
       "stock": 4,
       "weightGrams": 0,
-      "shippingWeightGrams": 0
+      "shippingWeightGrams": 1000
     },
     {
       "id": "chant-guitare",
@@ -570,7 +570,7 @@
       "priceCents": 7000,
       "stock": 1,
       "weightGrams": 119,
-      "shippingWeightGrams": 0
+      "shippingWeightGrams": 1000
     },
     {
       "id": "pomme-amour",
@@ -587,7 +587,7 @@
       "priceCents": 1000,
       "stock": 1,
       "weightGrams": 17,
-      "shippingWeightGrams": 0
+      "shippingWeightGrams": 1000
     },
     {
       "id": "coin-fenetre-bzh",
@@ -604,7 +604,7 @@
       "priceCents": 12000,
       "stock": 1,
       "weightGrams": 360,
-      "shippingWeightGrams": 0
+      "shippingWeightGrams": 1110
     },
     {
       "id": "rose",
@@ -615,7 +615,7 @@
       "alt": "Rose bleue en vitrail dans un décor végétal",
       "featured": true,
       "published": true,
-      "forSale": true,
+      "forSale": false,
       "priceCents": 9999,
       "stock": 1,
       "weightGrams": 250
