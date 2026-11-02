@@ -2,6 +2,7 @@ import 'server-only';
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { randomUUID } from 'node:crypto';
+import {BlobPreconditionFailedError,get as getBlob,put as putBlob} from '@vercel/blob';
 import {editorialDefaults,imageDefaults,faqDefaults} from './editorial-content';
 export type Work = { id:string; title:string; category:string; description:string; image:string; images:string[]; alt:string; dimensions:string; featured:boolean; published:boolean; forSale:boolean; priceCents:number; stock:number; weightGrams:number; shippingWeightGrams:number };
 export type Event = { id:string; title:string; date:string; endDate:string; place:string; address:string; description:string; details:string; admission:string; bookingEmail:string; externalUrl:string; image:string; alt:string; published:boolean };
@@ -37,16 +38,51 @@ export const initialData:SiteData = {
 const dataDir=process.env.SITE_DATA_DIR || join(process.cwd(),'data');
 export const mediaDir=join(dataDir,'uploads');
 const pathFor=(name:string)=>join(/* turbopackIgnore: true */ dataDir,name);
+export const usesBlobStorage=process.env.SITE_STORAGE==='blob';
 let writeQueue:Promise<unknown>=Promise.resolve();
-async function readJson<T>(name:string,fallback:T):Promise<T> { try {return JSON.parse(await readFile(/* turbopackIgnore: true */ pathFor(name),'utf8')) as T} catch(error) {if((error as NodeJS.ErrnoException).code==='ENOENT') return fallback; throw error} }
-async function saveJson<T>(name:string,value:T) { const pending=writeQueue.then(async()=>{await mkdir(dataDir,{recursive:true});const temporary=pathFor(name+'.'+randomUUID()+'.tmp');await writeFile(temporary,JSON.stringify(value,null,2),{encoding:'utf8',mode:0o600});await rename(temporary,pathFor(name))});writeQueue=pending.catch(()=>undefined);await pending }
+const blobPath=(name:string)=>'site-data/'+name;
+async function readStoredJson<T>(name:string,fallback:T):Promise<{value:T;etag:string|null}>{
+ if(usesBlobStorage){
+  const result=await getBlob(blobPath(name),{access:'private'});
+  if(!result){
+   if(name==='content.json'){
+    try{return {value:JSON.parse(await readFile(/* turbopackIgnore: true */ pathFor(name),'utf8')) as T,etag:null}}
+    catch(error){if((error as NodeJS.ErrnoException).code!=='ENOENT')throw error}
+   }
+   return {value:fallback,etag:null};
+  }
+  if(result.statusCode!==200||!result.stream)throw new Error('Lecture du stockage Vercel impossible.');
+  return {value:await new Response(result.stream).json() as T,etag:result.blob.etag};
+ }
+ try{return {value:JSON.parse(await readFile(/* turbopackIgnore: true */ pathFor(name),'utf8')) as T,etag:null}}
+ catch(error){if((error as NodeJS.ErrnoException).code==='ENOENT')return {value:fallback,etag:null};throw error}
+}
+async function readJson<T>(name:string,fallback:T):Promise<T>{return (await readStoredJson(name,fallback)).value}
+async function writeStoredJson<T>(name:string,value:T,etag:string|null){
+ if(usesBlobStorage){
+  await putBlob(blobPath(name),JSON.stringify(value),{access:'private',contentType:'application/json',allowOverwrite:etag!==null,ifMatch:etag??undefined,cacheControlMaxAge:60});
+  return;
+ }
+ if(process.env.VERCEL==='1')throw new Error('Stockage persistant non configuré : connectez Vercel Blob et définissez SITE_STORAGE=blob.');
+ await mkdir(dataDir,{recursive:true});const temporary=pathFor(name+'.'+randomUUID()+'.tmp');await writeFile(temporary,JSON.stringify(value,null,2),{encoding:'utf8',mode:0o600});await rename(temporary,pathFor(name));
+}
+async function saveJson<T>(name:string,value:T){const pending=writeQueue.then(async()=>{const {etag}=await readStoredJson(name,value);await writeStoredJson(name,value,etag)});writeQueue=pending.catch(()=>undefined);await pending}
+async function updateJson<T,R>(name:string,fallback:T,update:(current:T)=>{value:T;result:R}):Promise<R>{
+ for(let attempt=0;attempt<5;attempt++){
+  const {value,etag}=await readStoredJson(name,fallback);
+  const next=update(value);
+  try{await writeStoredJson(name,next.value,etag);return next.result}
+  catch(error){if(!(usesBlobStorage&&error instanceof BlobPreconditionFailedError&&attempt<4))throw error}
+ }
+ throw new Error('Le stockage a changé pendant la mise à jour.');
+}
 export async function getSiteData(){const stored=await readJson<SiteData>('content.json',initialData);return {...initialData,...stored,profile:{...initialData.profile,...stored.profile},commerce:{...initialData.commerce,...stored.commerce,enabled:stored.commerce?.enabled===true&&typeof stored.commerce.chronopostHomeEnabled==='boolean'&&typeof stored.commerce.colissimoHomeEnabled==='boolean'},editorial:{...editorialDefaults,...stored.editorial},images:{...imageDefaults,...stored.images},faq:(stored.faq||faqDefaults).map(item=>({...item,published:item.published!==false})),events:(stored.events||initialData.events).map(event=>({...event,endDate:event.endDate||'',address:event.address||'',details:event.details||'',admission:event.admission||'',bookingEmail:event.bookingEmail||'',externalUrl:event.externalUrl||'',alt:event.alt||event.title})),works:(stored.works||initialData.works).map(work=>{const images=Array.isArray(work.images)?work.images.filter(Boolean):[];const image=work.image||images[0]||'';return {...work,image,images:images.length?images:image?[image]:[],dimensions:typeof work.dimensions==='string'?work.dimensions:'',published:work.published!==false,forSale:work.forSale===true,priceCents:Number.isInteger(work.priceCents)?work.priceCents:0,stock:Number.isInteger(work.stock)?work.stock:0,weightGrams:Number.isInteger(work.weightGrams)?work.weightGrams:0,shippingWeightGrams:Number.isInteger(work.shippingWeightGrams)?work.shippingWeightGrams:0}}),testimonials:(stored.testimonials||[]).map(item=>({...item,published:item.published!==false})),services:(stored.services||initialData.services).map(service=>{const fallback=initialData.services.find(item=>item.id===service.id);return {...service,published:service.published!==false,image:service.image||fallback?.image||'',alt:service.alt||fallback?.alt||service.title}})}}
 export async function saveSiteData(value:SiteData){await saveJson('content.json',value)}
 export async function getMessages(){return readJson<Message[]>('messages.json',[])}
 export async function saveMessages(value:Message[]){await saveJson('messages.json',value)}
 let messageQueue:Promise<unknown>=Promise.resolve();
 export async function updateMessages<T>(update:(items:Message[])=>{items:Message[];result:T}):Promise<T>{
- const pending=messageQueue.then(async()=>{const current=await getMessages();const next=update(current);await saveMessages(next.items);return next.result});
+ const pending=messageQueue.then(()=>updateJson('messages.json',[] as Message[],current=>{const next=update(current);return {value:next.items,result:next.result}}));
  messageQueue=pending.catch(()=>undefined);
  return pending;
 }
@@ -65,7 +101,7 @@ export function withCommerceLock<T>(action:()=>Promise<T>):Promise<T>{
  return pending;
 }
 export async function updateOrders<T>(update:(items:Order[])=>{items:Order[];result:T}):Promise<T>{
- const pending=orderQueue.then(async()=>{const current=await getOrders();const next=update(current);await saveOrders(next.items);return next.result});
+ const pending=orderQueue.then(()=>updateJson('orders.json',[] as Order[],current=>{const next=update(current);return {value:next.items,result:next.result}}));
  orderQueue=pending.catch(()=>undefined);
  return pending;
 }
