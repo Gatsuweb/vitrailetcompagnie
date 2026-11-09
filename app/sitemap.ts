@@ -1,2 +1,14 @@
 import type {MetadataRoute} from 'next';
-export default function sitemap():MetadataRoute.Sitemap{const origin=process.env.NEXT_PUBLIC_SITE_URL;if(!origin)return [];return ['/','/a-propos','/prestations','/creations','/contact','/evenements'].map((path,index)=>({url:new URL(path,origin).toString(),changeFrequency:'monthly' as const,priority:index===0?1:.7}))}
+import {getSiteData} from '../lib/site-data';
+import {absoluteSiteUrl} from '../lib/seo';
+
+export const dynamic='force-dynamic';
+
+export default async function sitemap():Promise<MetadataRoute.Sitemap>{
+ const {events}=await getSiteData();
+ const pages=['/','/a-propos','/prestations','/creations','/contact','/evenements'];
+ return [
+  ...pages.map((path,index)=>({url:absoluteSiteUrl(path),changeFrequency:'monthly' as const,priority:index===0?1:.7})),
+  ...events.filter(event=>event.published).map(event=>({url:absoluteSiteUrl(`/evenements/${encodeURIComponent(event.id)}`),changeFrequency:'monthly' as const,priority:.5})),
+ ];
+}

@@ -14,7 +14,7 @@ export async function generateMetadata({params}:Props):Promise<Metadata>{
  const {id}=await params;
  const {events}=await getSiteData();
  const event=events.find(item=>item.id===id&&item.published);
- return event?{title:`${event.title} | Vitrail & compagnie`,description:event.description,openGraph:{title:event.title,description:event.description,images:event.image?[event.image]:[]}}:{title:'Événement introuvable | Vitrail & compagnie',robots:{index:false}};
+ return event?{title:`${event.title} | Vitrail & compagnie`,description:event.description,alternates:{canonical:`/evenements/${encodeURIComponent(id)}`},openGraph:{title:event.title,description:event.description,url:`/evenements/${encodeURIComponent(id)}`,images:event.image?[event.image]:[]}}:{title:'Événement introuvable | Vitrail & compagnie',robots:{index:false}};
 }
 
 export default async function EventDetails({params}:Props){

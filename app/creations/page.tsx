@@ -9,7 +9,7 @@ export const dynamic='force-dynamic';
 
 export async function generateMetadata():Promise<Metadata>{
  const {editorial}=await getSiteData();
- return {title:editorial.seoWorksTitle,description:editorial.seoWorksDescription};
+ return {title:editorial.seoWorksTitle,description:editorial.seoWorksDescription,alternates:{canonical:'/creations'},openGraph:{title:editorial.seoWorksTitle,description:editorial.seoWorksDescription,url:'/creations'}};
 }
 
 export default async function Creations(){

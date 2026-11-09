@@ -9,7 +9,7 @@ export const dynamic='force-dynamic';
 export async function generateMetadata():Promise<Metadata>{
  const {profile}=await getSiteData();
  const complete=Boolean(profile.legalName&&profile.legalAddress&&profile.siret&&profile.publisher&&profile.hostName&&profile.hostAddress);
- return {title:'Mentions légales | Vitrail & compagnie',robots:{index:complete,follow:true}};
+ return {title:'Mentions légales | Vitrail & compagnie',alternates:{canonical:'/mentions-legales'},robots:{index:complete,follow:true}};
 }
 
 const Value=({value}:{value:string})=><span className={value?'':styles.missing}>{value||'À compléter avant la mise en ligne'}</span>;

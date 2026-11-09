@@ -1,2 +1,6 @@
 import type {MetadataRoute} from 'next';
-export default function robots():MetadataRoute.Robots{const origin=process.env.NEXT_PUBLIC_SITE_URL;return {rules:{userAgent:'*',allow:'/',disallow:['/admin','/api/admin','/api/contact','/confidentialite']},...(origin?{sitemap:new URL('/sitemap.xml',origin).toString()}:{})}}
+import {absoluteSiteUrl} from '../lib/seo';
+
+export default function robots():MetadataRoute.Robots{
+ return {rules:{userAgent:'*',allow:'/',disallow:['/admin','/api/admin','/api/contact']},sitemap:absoluteSiteUrl('/sitemap.xml')};
+}

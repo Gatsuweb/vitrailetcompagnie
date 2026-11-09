@@ -10,7 +10,7 @@ export const dynamic='force-dynamic';
 
 export async function generateMetadata():Promise<Metadata>{
  const {editorial:t}=await getSiteData();
- return {title:t.seoEventsTitle,description:t.seoEventsDescription};
+ return {title:t.seoEventsTitle,description:t.seoEventsDescription,alternates:{canonical:'/evenements'},openGraph:{title:t.seoEventsTitle,description:t.seoEventsDescription,url:'/evenements'}};
 }
 
 export default async function Events(){
